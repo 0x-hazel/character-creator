@@ -21,7 +21,11 @@ class LocalDataFetcher extends DataFetcher {
     async fetch(path) {
         let result = this.object;
         for (let segment of splitPath(path)) {
-            result = result[segment];
+            try {
+                result = result[segment];
+            } catch (e) {
+                return undefined;
+            }
         }
         return result;
     }

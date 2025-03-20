@@ -1,6 +1,7 @@
 const SECTION_TEMPLATE = document.getElementById("accordion-section");
 const ACCORDION = document.getElementById("accordion");
 const SPINNER = document.getElementById("loading-spinner");
+const ENUM_CARD = document.getElementById("enum-card");
 
 const CHARACTER = new Object(null);
 const CHAR_PREVIEW = document.getElementById("char-preview");
@@ -72,24 +73,126 @@ function addRange(name, min, max, initial) {
     createSection(name, div);
 }
 
-function addEnum(name, path, transformer) {
+function addEnum(name, remote, path, transformer) {
     let spinner = SPINNER.content.cloneNode(true);
     let content = document.createElement("div");
     content.appendChild(spinner);
     createSection(name, content);
-    path.then(async (value) => {
+    remote.fetch(path).then(async (value) => {
         let grid = document.createElement("div");
         grid.setAttribute("class", "row g-3 p-3");
         for (let val of value.results) {
-            let entry = transformer(val);
+            let data = await remote.fetch(val["url"]);
+            if (data === undefined) {
+                // hopefully shouldn't happen on live api but my local copy doesn't need to contain the entire database
+                continue;
+            }
+            let entry = await transformer(data);
             let gridEntry = document.createElement("div");
             gridEntry.setAttribute("class", "col-lg-3 col-md-6 col-sm-12");
-            gridEntry.appendChild(entry);
+            try {
+                gridEntry.appendChild(entry);
+            } catch (e) {
+                console.error(e);
+            }
+
             grid.appendChild(gridEntry);
         }
         content.innerHTML = "";
         content.appendChild(grid);
     });
+}
+
+function enumCard(id, shown, expanded, isMulti = false, select = () => {
+    console.log("click");
+}) {
+    let template = ENUM_CARD.content.cloneNode(true);
+    let result = template.querySelector(".card-body");
+    id = `enum-${id}-content`;
+    for (let item of shown) {
+        result.appendChild(item);
+    }
+    let content = document.createElement("div");
+    content.setAttribute("id", id);
+    content.classList.add("collapse");
+    console.log(expanded);
+    for (let item of expanded) {
+        content.appendChild(item);
+    }
+    let button = document.createElement("button");
+    button.innerText = "Select";
+    button.setAttribute("type", "button");
+    button.className = "btn btn-outline-primary";
+    if (isMulti) {
+        button.setAttribute("data-bs-toggle", "button");
+    }
+    button.addEventListener("click", select);
+    template.querySelector(".card").appendChild(button);
+    result.appendChild(content);
+    result.innerHTML = result.innerHTML.replaceAll("!ID!", id);
+    return template;
+}
+
+function quickSection(title, text) {
+    let result = document.createElement("div");
+    let bold = document.createElement("b");
+    bold.innerText = title;
+    let parag = document.createElement("p");
+    parag.innerText = text;
+    result.appendChild(bold);
+    result.appendChild(parag);
+    return result;
+}
+
+function quickStat(name, value) {
+    let result = document.createElement("p");
+    let span = document.createElement("b");
+    span.innerText = `${name}: `;
+    result.appendChild(span);
+    result.appendChild(document.createTextNode(value));
+    return result;
+}
+
+function quickTable(name, values) {
+    let result = document.createElement("div");
+    let title = document.createElement("b");
+    title.innerText = name;
+    result.appendChild(title);
+    let list = document.createElement("ul");
+    for (let element of values) {
+        let el = document.createElement("li");
+        let b = document.createElement("b");
+        b.innerText = `${element[0]}: `;
+        el.appendChild(b);
+        el.appendChild(document.createTextNode(element[1]));
+        list.appendChild(el);
+    }
+    result.appendChild(list);
+    return result;
+}
+
+function quickList(name, values) {
+    let result = document.createElement("div");
+    let title = document.createElement("b");
+    title.innerText = name;
+    result.appendChild(title);
+    let list = document.createElement("ul");
+    for (let element of values) {
+        let el = document.createElement("li");
+        el.innerText = element;
+        list.appendChild(el);
+    }
+    result.appendChild(list);
+    return result;
+}
+
+async function quickTrait(remote, path) {
+    let content = document.createElement("div");
+    let value = await remote.fetch(path);
+    if (value !== undefined) {
+        content.appendChild(quickSection(value.name, value.desc[0]));
+    }
+    return content;
 }
 
 // https://stackoverflow.com/questions/36280818/how-to-convert-file-to-base64-in-javascript

@@ -2,32 +2,654 @@ const SYSTEMS = {
     "dnd": {
         name: "D&D 5e",
         characterCreation() {
-            let remote = new RemoteDataFetcher("https://www.dnd5eapi.co");
+            let remote = new LocalDataFetcher({
+                api: {
+                    2014: {
+                        traits: {
+                            "damage-resistance": {
+                                "index": "damage-resistance",
+                                "races": [{
+                                    "index": "dragonborn",
+                                    "name": "Dragonborn",
+                                    "url": "/api/2014/races/dragonborn",
+                                }],
+                                "subraces": [],
+                                "name": "Damage Resistance",
+                                "desc": [
+                                    "You have resistance to the damage type associated with your draconic ancestry.",
+                                ],
+                                "proficiencies": [],
+                                "url": "/api/2014/traits/damage-resistance",
+                                "updated_at": "2025-03-19T04:12:50.889Z",
+                            },
+                            "breath-weapon": {
+                                "index": "breath-weapon",
+                                "races": [{
+                                    "index": "dragonborn",
+                                    "name": "Dragonborn",
+                                    "url": "/api/2014/races/dragonborn",
+                                }],
+                                "subraces": [],
+                                "name": "Breath Weapon",
+                                "desc": [
+                                    "You can use your action to exhale destructive energy. Your draconic ancestry determines the size, shape, and damage type of the exhalation.",
+                                    "When you use your breath weapon, each creature in the area of the exhalation must make a saving throw, the type of which is determined by your draconic ancestry. The DC for this saving throw equals 8 + your Constitution modifier + your proficiency bonus. A creature takes 2d6 damage on a failed save, and half as much damage on a successful one. The damage increases to 3d6 at 6th level, 4d6 at 11th level, and 5d6 at 16th level.",
+                                    "After you use your breath weapon, you cannot use it again until you complete a short or long rest.",
+                                ],
+                                "proficiencies": [],
+                                "url": "/api/2014/traits/breath-weapon",
+                                "updated_at": "2025-03-19T04:12:50.889Z",
+                            },
+                            "draconic-ancestry": {
+                                "index": "draconic-ancestry",
+                                "races": [{
+                                    "index": "dragonborn",
+                                    "name": "Dragonborn",
+                                    "url": "/api/2014/races/dragonborn",
+                                }],
+                                "subraces": [],
+                                "name": "Draconic Ancestry",
+                                "desc": [
+                                    "You have draconic ancestry. Choose one type of dragon from the Draconic Ancestry table. Your breath weapon and damage resistance are determined by the dragon type, as shown in the table.",
+                                ],
+                                "proficiencies": [],
+                                "trait_specific": {
+                                    "subtrait_options": {
+                                        "choose": 1,
+                                        "from": {
+                                            "option_set_type": "options_array",
+                                            "options": [{
+                                                "option_type": "reference",
+                                                "item": {
+                                                    "index":
+                                                        "draconic-ancestry-black",
+                                                    "name":
+                                                        "Draconic Ancestry (Black)",
+                                                    "url":
+                                                        "/api/2014/traits/draconic-ancestry-black",
+                                                },
+                                            }, {
+                                                "option_type": "reference",
+                                                "item": {
+                                                    "index":
+                                                        "draconic-ancestry-blue",
+                                                    "name":
+                                                        "Draconic Ancestry (Blue)",
+                                                    "url":
+                                                        "/api/2014/traits/draconic-ancestry-blue",
+                                                },
+                                            }, {
+                                                "option_type": "reference",
+                                                "item": {
+                                                    "index":
+                                                        "draconic-ancestry-brass",
+                                                    "name":
+                                                        "Draconic Ancestry (Brass)",
+                                                    "url":
+                                                        "/api/2014/traits/draconic-ancestry-brass",
+                                                },
+                                            }, {
+                                                "option_type": "reference",
+                                                "item": {
+                                                    "index":
+                                                        "draconic-ancestry-bronze",
+                                                    "name":
+                                                        "Draconic Ancestry (Bronze)",
+                                                    "url":
+                                                        "/api/2014/traits/draconic-ancestry-bronze",
+                                                },
+                                            }, {
+                                                "option_type": "reference",
+                                                "item": {
+                                                    "index":
+                                                        "draconic-ancestry-copper",
+                                                    "name":
+                                                        "Draconic Ancestry (Copper)",
+                                                    "url":
+                                                        "/api/2014/traits/draconic-ancestry-copper",
+                                                },
+                                            }, {
+                                                "option_type": "reference",
+                                                "item": {
+                                                    "index":
+                                                        "draconic-ancestry-gold",
+                                                    "name":
+                                                        "Draconic Ancestry (Gold)",
+                                                    "url":
+                                                        "/api/2014/traits/draconic-ancestry-gold",
+                                                },
+                                            }, {
+                                                "option_type": "reference",
+                                                "item": {
+                                                    "index":
+                                                        "draconic-ancestry-green",
+                                                    "name":
+                                                        "Draconic Ancestry (Green)",
+                                                    "url":
+                                                        "/api/2014/traits/draconic-ancestry-green",
+                                                },
+                                            }, {
+                                                "option_type": "reference",
+                                                "item": {
+                                                    "index":
+                                                        "draconic-ancestry-red",
+                                                    "name":
+                                                        "Draconic Ancestry (Red)",
+                                                    "url":
+                                                        "/api/2014/traits/draconic-ancestry-red",
+                                                },
+                                            }, {
+                                                "option_type": "reference",
+                                                "item": {
+                                                    "index":
+                                                        "draconic-ancestry-silver",
+                                                    "name":
+                                                        "Draconic Ancestry (Silver)",
+                                                    "url":
+                                                        "/api/2014/traits/draconic-ancestry-silver",
+                                                },
+                                            }, {
+                                                "option_type": "reference",
+                                                "item": {
+                                                    "index":
+                                                        "draconic-ancestry-white",
+                                                    "name":
+                                                        "Draconic Ancestry (White)",
+                                                    "url":
+                                                        "/api/2014/traits/draconic-ancestry-white",
+                                                },
+                                            }],
+                                        },
+                                        "type": "trait",
+                                    },
+                                },
+                                "url": "/api/2014/traits/draconic-ancestry",
+                                "updated_at": "2025-03-19T04:12:50.889Z",
+                            },
+                        },
+                        races: {
+                            "count": 9,
+                            "results": [{
+                                "index": "dragonborn",
+                                "name": "Dragonborn",
+                                "url": "/api/2014/races/dragonborn",
+                            }, {
+                                "index": "dwarf",
+                                "name": "Dwarf",
+                                "url": "/api/2014/races/dwarf",
+                            }, {
+                                "index": "elf",
+                                "name": "Elf",
+                                "url": "/api/2014/races/elf",
+                            }, {
+                                "index": "gnome",
+                                "name": "Gnome",
+                                "url": "/api/2014/races/gnome",
+                            }, {
+                                "index": "half-elf",
+                                "name": "Half-Elf",
+                                "url": "/api/2014/races/half-elf",
+                            }, {
+                                "index": "half-orc",
+                                "name": "Half-Orc",
+                                "url": "/api/2014/races/half-orc",
+                            }, {
+                                "index": "halfling",
+                                "name": "Halfling",
+                                "url": "/api/2014/races/halfling",
+                            }, {
+                                "index": "human",
+                                "name": "Human",
+                                "url": "/api/2014/races/human",
+                            }, {
+                                "index": "tiefling",
+                                "name": "Tiefling",
+                                "url": "/api/2014/races/tiefling",
+                            }],
+                            dragonborn: {
+                                "index": "dragonborn",
+                                "name": "Dragonborn",
+                                "speed": 30,
+                                "ability_bonuses": [{
+                                    "ability_score": {
+                                        "index": "str",
+                                        "name": "STR",
+                                        "url": "/api/2014/ability-scores/str",
+                                    },
+                                    "bonus": 2,
+                                }, {
+                                    "ability_score": {
+                                        "index": "cha",
+                                        "name": "CHA",
+                                        "url": "/api/2014/ability-scores/cha",
+                                    },
+                                    "bonus": 1,
+                                }],
+                                "alignment":
+                                    "Dragonborn tend to extremes, making a conscious choice for one side or the other in the cosmic war between good and evil. Most dragonborn are good, but those who side with evil can be terrible villains.",
+                                "age":
+                                    "Young dragonborn grow quickly. They walk hours after hatching, attain the size and development of a 10-year-old human child by the age of 3, and reach adulthood by 15. They live to be around 80.",
+                                "size": "Medium",
+                                "size_description":
+                                    "Dragonborn are taller and heavier than humans, standing well over 6 feet tall and averaging almost 250 pounds. Your size is Medium.",
+                                "starting_proficiencies": [],
+                                "languages": [{
+                                    "index": "common",
+                                    "name": "Common",
+                                    "url": "/api/2014/languages/common",
+                                }, {
+                                    "index": "draconic",
+                                    "name": "Draconic",
+                                    "url": "/api/2014/languages/draconic",
+                                }],
+                                "language_desc":
+                                    "You can speak, read, and write Common and Draconic. Draconic is thought to be one of the oldest languages and is often used in the study of magic. The language sounds harsh to most other creatures and includes numerous hard consonants and sibilants.",
+                                "traits": [{
+                                    "index": "draconic-ancestry",
+                                    "name": "Draconic Ancestry",
+                                    "url": "/api/2014/traits/draconic-ancestry",
+                                }, {
+                                    "index": "breath-weapon",
+                                    "name": "Breath Weapon",
+                                    "url": "/api/2014/traits/breath-weapon",
+                                }, {
+                                    "index": "damage-resistance",
+                                    "name": "Damage Resistance",
+                                    "url": "/api/2014/traits/damage-resistance",
+                                }],
+                                "subraces": [],
+                                "url": "/api/2014/races/dragonborn",
+                                "updated_at": "2025-03-19T04:12:47.371Z",
+                            },
+                        },
+                        classes: {
+                            "count": 12,
+                            "results": [{
+                                "index": "barbarian",
+                                "name": "Barbarian",
+                                "url": "/api/2014/classes/barbarian",
+                            }, {
+                                "index": "bard",
+                                "name": "Bard",
+                                "url": "/api/2014/classes/bard",
+                            }, {
+                                "index": "cleric",
+                                "name": "Cleric",
+                                "url": "/api/2014/classes/cleric",
+                            }, {
+                                "index": "druid",
+                                "name": "Druid",
+                                "url": "/api/2014/classes/druid",
+                            }, {
+                                "index": "fighter",
+                                "name": "Fighter",
+                                "url": "/api/2014/classes/fighter",
+                            }, {
+                                "index": "monk",
+                                "name": "Monk",
+                                "url": "/api/2014/classes/monk",
+                            }, {
+                                "index": "paladin",
+                                "name": "Paladin",
+                                "url": "/api/2014/classes/paladin",
+                            }, {
+                                "index": "ranger",
+                                "name": "Ranger",
+                                "url": "/api/2014/classes/ranger",
+                            }, {
+                                "index": "rogue",
+                                "name": "Rogue",
+                                "url": "/api/2014/classes/rogue",
+                            }, {
+                                "index": "sorcerer",
+                                "name": "Sorcerer",
+                                "url": "/api/2014/classes/sorcerer",
+                            }, {
+                                "index": "warlock",
+                                "name": "Warlock",
+                                "url": "/api/2014/classes/warlock",
+                            }, {
+                                "index": "wizard",
+                                "name": "Wizard",
+                                "url": "/api/2014/classes/wizard",
+                            }],
+                            barbarian: {
+                                "index": "barbarian",
+                                "name": "Barbarian",
+                                "hit_die": 12,
+                                "proficiency_choices": [{
+                                    "desc":
+                                        "Choose two from Animal Handling, Athletics, Intimidation, Nature, Perception, and Survival",
+                                    "choose": 2,
+                                    "type": "proficiencies",
+                                    "from": {
+                                        "option_set_type": "options_array",
+                                        "options": [{
+                                            "option_type": "reference",
+                                            "item": {
+                                                "index":
+                                                    "skill-animal-handling",
+                                                "name":
+                                                    "Skill: Animal Handling",
+                                                "url":
+                                                    "/api/2014/proficiencies/skill-animal-handling",
+                                            },
+                                        }, {
+                                            "option_type": "reference",
+                                            "item": {
+                                                "index": "skill-athletics",
+                                                "name": "Skill: Athletics",
+                                                "url":
+                                                    "/api/2014/proficiencies/skill-athletics",
+                                            },
+                                        }, {
+                                            "option_type": "reference",
+                                            "item": {
+                                                "index": "skill-intimidation",
+                                                "name": "Skill: Intimidation",
+                                                "url":
+                                                    "/api/2014/proficiencies/skill-intimidation",
+                                            },
+                                        }, {
+                                            "option_type": "reference",
+                                            "item": {
+                                                "index": "skill-nature",
+                                                "name": "Skill: Nature",
+                                                "url":
+                                                    "/api/2014/proficiencies/skill-nature",
+                                            },
+                                        }, {
+                                            "option_type": "reference",
+                                            "item": {
+                                                "index": "skill-perception",
+                                                "name": "Skill: Perception",
+                                                "url":
+                                                    "/api/2014/proficiencies/skill-perception",
+                                            },
+                                        }, {
+                                            "option_type": "reference",
+                                            "item": {
+                                                "index": "skill-survival",
+                                                "name": "Skill: Survival",
+                                                "url":
+                                                    "/api/2014/proficiencies/skill-survival",
+                                            },
+                                        }],
+                                    },
+                                }],
+                                "proficiencies": [{
+                                    "index": "light-armor",
+                                    "name": "Light Armor",
+                                    "url":
+                                        "/api/2014/proficiencies/light-armor",
+                                }, {
+                                    "index": "medium-armor",
+                                    "name": "Medium Armor",
+                                    "url":
+                                        "/api/2014/proficiencies/medium-armor",
+                                }, {
+                                    "index": "shields",
+                                    "name": "Shields",
+                                    "url": "/api/2014/proficiencies/shields",
+                                }, {
+                                    "index": "simple-weapons",
+                                    "name": "Simple Weapons",
+                                    "url":
+                                        "/api/2014/proficiencies/simple-weapons",
+                                }, {
+                                    "index": "martial-weapons",
+                                    "name": "Martial Weapons",
+                                    "url":
+                                        "/api/2014/proficiencies/martial-weapons",
+                                }, {
+                                    "index": "saving-throw-str",
+                                    "name": "Saving Throw: STR",
+                                    "url":
+                                        "/api/2014/proficiencies/saving-throw-str",
+                                }, {
+                                    "index": "saving-throw-con",
+                                    "name": "Saving Throw: CON",
+                                    "url":
+                                        "/api/2014/proficiencies/saving-throw-con",
+                                }],
+                                "saving_throws": [{
+                                    "index": "str",
+                                    "name": "STR",
+                                    "url": "/api/2014/ability-scores/str",
+                                }, {
+                                    "index": "con",
+                                    "name": "CON",
+                                    "url": "/api/2014/ability-scores/con",
+                                }],
+                                "starting_equipment": [{
+                                    "equipment": {
+                                        "index": "explorers-pack",
+                                        "name": "Explorer's Pack",
+                                        "url":
+                                            "/api/2014/equipment/explorers-pack",
+                                    },
+                                    "quantity": 1,
+                                }, {
+                                    "equipment": {
+                                        "index": "javelin",
+                                        "name": "Javelin",
+                                        "url": "/api/2014/equipment/javelin",
+                                    },
+                                    "quantity": 4,
+                                }],
+                                "starting_equipment_options": [{
+                                    "desc":
+                                        "(a) a greataxe or (b) any martial melee weapon",
+                                    "choose": 1,
+                                    "type": "equipment",
+                                    "from": {
+                                        "option_set_type": "options_array",
+                                        "options": [{
+                                            "option_type": "counted_reference",
+                                            "count": 1,
+                                            "of": {
+                                                "index": "greataxe",
+                                                "name": "Greataxe",
+                                                "url":
+                                                    "/api/2014/equipment/greataxe",
+                                            },
+                                        }, {
+                                            "option_type": "choice",
+                                            "choice": {
+                                                "desc":
+                                                    "any martial melee weapon",
+                                                "choose": 1,
+                                                "type": "equipment",
+                                                "from": {
+                                                    "option_set_type":
+                                                        "equipment_category",
+                                                    "equipment_category": {
+                                                        "index":
+                                                            "martial-melee-weapons",
+                                                        "name":
+                                                            "Martial Melee Weapons",
+                                                        "url":
+                                                            "/api/2014/equipment-categories/martial-melee-weapons",
+                                                    },
+                                                },
+                                            },
+                                        }],
+                                    },
+                                }, {
+                                    "desc":
+                                        "(a) two handaxes or (b) any simple weapon",
+                                    "choose": 1,
+                                    "type": "equipment",
+                                    "from": {
+                                        "option_set_type": "options_array",
+                                        "options": [{
+                                            "option_type": "counted_reference",
+                                            "count": 2,
+                                            "of": {
+                                                "index": "handaxe",
+                                                "name": "Handaxe",
+                                                "url":
+                                                    "/api/2014/equipment/handaxe",
+                                            },
+                                        }, {
+                                            "option_type": "choice",
+                                            "choice": {
+                                                "desc": "any simple weapon",
+                                                "choose": 1,
+                                                "type": "equipment",
+                                                "from": {
+                                                    "option_set_type":
+                                                        "equipment_category",
+                                                    "equipment_category": {
+                                                        "index":
+                                                            "simple-weapons",
+                                                        "name":
+                                                            "Simple Weapons",
+                                                        "url":
+                                                            "/api/2014/equipment-categories/simple-weapons",
+                                                    },
+                                                },
+                                            },
+                                        }],
+                                    },
+                                }],
+                                "class_levels":
+                                    "/api/2014/classes/barbarian/levels",
+                                "multi_classing": {
+                                    "prerequisites": [{
+                                        "ability_score": {
+                                            "index": "str",
+                                            "name": "STR",
+                                            "url":
+                                                "/api/2014/ability-scores/str",
+                                        },
+                                        "minimum_score": 13,
+                                    }],
+                                    "proficiencies": [{
+                                        "index": "shields",
+                                        "name": "Shields",
+                                        "url":
+                                            "/api/2014/proficiencies/shields",
+                                    }, {
+                                        "index": "simple-weapons",
+                                        "name": "Simple Weapons",
+                                        "url":
+                                            "/api/2014/proficiencies/simple-weapons",
+                                    }, {
+                                        "index": "martial-weapons",
+                                        "name": "Martial Weapons",
+                                        "url":
+                                            "/api/2014/proficiencies/martial-weapons",
+                                    }],
+                                },
+                                "subclasses": [{
+                                    "index": "berserker",
+                                    "name": "Berserker",
+                                    "url": "/api/2014/subclasses/berserker",
+                                }],
+                                "url": "/api/2014/classes/barbarian",
+                                "updated_at": "2025-03-19T04:12:35.969Z",
+                            },
+                        },
+                    },
+                },
+            }); //new RemoteDataFetcher("https://www.dnd5eapi.co");
             addTextLine("Name", "Your Character's Name");
             addRange("Character Level", 1, 20, 1);
-            addEnum("Race", remote.fetch("/api/2014/races"), (value) => {
-                let div = document.createElement("div");
-                div.setAttribute("class", "card");
-                let body = document.createElement("div");
-                body.setAttribute("class", "card-body");
-                div.appendChild(body);
+            addEnum("Race", remote, "/api/2014/races", async (value) => {
                 let name = document.createElement("h5");
                 name.setAttribute("class", "card-title no-margin");
                 name.innerText = value.name;
-                body.appendChild(name);
-                return div;
+                let traits = await Promise.all(
+                    value.traits.map(async (trait) =>
+                        await quickTrait(remote, trait.url)
+                    ),
+                );
+                console.log(traits);
+                return enumCard(
+                    value.index,
+                    [name],
+                    [
+                        document.createElement("hr"),
+                        quickTable(
+                            "Ability Bonuses",
+                            value.ability_bonuses.map(
+                                (
+                                    x,
+                                ) => [
+                                    x.ability_score.name,
+                                    (x.bonus > 0) ? `+${x.bonus}` : x.bonus,
+                                ],
+                            ),
+                        ),
+                        ...traits,
+                        quickStat("Speed", value.speed),
+                        quickSection("Age", value.age),
+                        quickSection("Size", value.size_description),
+                        quickSection("Language", value.language_desc),
+                    ],
+                    false,
+                    () => {
+                        CHARACTER["Race"] = value.name;
+                        CHARACTER["Race Bonuses"] = new Map(
+                            value.ability_bonuses.map((
+                                x,
+                            ) => [x.ability_score.name, x.bonus]),
+                        );
+                        CHARACTER["Size"] = "Medium";
+                        updateCharacterPreviews();
+                    },
+                );
             });
-            addEnum("Class", remote.fetch("/api/2014/classes"), (value) => {
-                let div = document.createElement("div");
-                div.setAttribute("class", "card");
-                let body = document.createElement("div");
-                body.setAttribute("class", "card-body");
-                div.appendChild(body);
+            CHARACTER["Class"] = new Map();
+            addEnum("Class", remote, "/api/2014/classes", async (value) => {
                 let name = document.createElement("h5");
                 name.setAttribute("class", "card-title no-margin");
                 name.innerText = value.name;
-                body.appendChild(name);
-                return div;
+                return enumCard(
+                    value.index,
+                    [name],
+                    [
+                        document.createElement("hr"),
+                        quickStat("Hit Die", `d${value.hit_die}`),
+                        quickSection(
+                            "Skill Proficiencies",
+                            value.proficiency_choices[0].desc,
+                        ),
+                        quickList(
+                            "Proficiencies",
+                            value.proficiencies.map((x) => x.name),
+                        ),
+                        quickList(
+                            "Starting Equipment",
+                            [
+                                ...value.starting_equipment.map((x) =>
+                                    x.equipment.name
+                                ),
+                                value.starting_equipment_options[0].desc,
+                            ],
+                        ),
+                    ],
+                    true,
+                    () => {
+                        if (CHARACTER["Class"].has(value.name)) {
+                            CHARACTER["Class"].delete(value.name);
+                        } else {
+                            if (
+                                [...CHARACTER["Class"].entries()].reduce(
+                                    (prev, curr) => prev + curr[1],
+                                    0,
+                                ) > CHARACTER["Character Level"]
+                            ) {
+                                console.warn(
+                                    "Character has more class levels than character levels",
+                                );
+                            }
+                            CHARACTER["Class"].set(value.name, 1);
+                        }
+                        updateCharacterPreviews();
+                    },
+                );
             });
         },
         characterPreview() {
@@ -37,7 +659,16 @@ const SYSTEMS = {
             );
         },
         characterDetails() {
-            return document.createElement("div");
+            let result = document.createElement("div");
+            let race = document.createElement("p");
+            race.innerText = CHARACTER["Race"] || "";
+            result.appendChild(race);
+            let classes = document.createElement("p");
+            classes.innerText = [...CHARACTER["Class"].entries()].map((x) =>
+                `${x[0]} Level ${x[1]}`
+            ).join(", ");
+            result.appendChild(classes);
+            return result;
         },
     },
 };
