@@ -4,6 +4,7 @@ const SPINNER = document.getElementById("loading-spinner");
 const ENUM_CARD = document.getElementById("enum-card");
 
 const CHARACTER = new Object(null);
+CHARACTER.isCharacter = true;
 const CHAR_PREVIEW = document.getElementById("char-preview");
 const CHAR_DETAILS = document.getElementById("char-details");
 
@@ -247,6 +248,11 @@ function updateCharacterPreviews() {
     CHAR_PREVIEW.appendChild(SYSTEMS[SYS].characterPreview());
     CHAR_DETAILS.innerHTML = "";
     CHAR_DETAILS.appendChild(SYSTEMS[SYS].characterDetails());
+}
+
+function saveCharacter() {
+    CHARACTER["system"] = SYS;
+    getStorage().setItem(CHARACTER["Name"], JSON.stringify(CHARACTER));
 }
 
 const SYS = document.location.hash.substring(1) || "dnd";

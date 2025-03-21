@@ -59,3 +59,7 @@ class RemoteDataFetcher extends DataFetcher {
 //     "/api/2014/classes/barbarian",
 // );
 // console.log(x);
+
+function getStorage() {
+    return sessionStorage; // make localStorage once development is stable
+}

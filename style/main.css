@@ -18,3 +18,19 @@
 .card-width {
     width: 15em;
 }
+
+.logo {
+    position: absolute;
+    left: 9em;
+    top: 86px;
+    width: 32px;
+    height: 32px;
+}
+
+img {
+    display: none;
+}
+
+img[src] {
+   display: block;
+ }

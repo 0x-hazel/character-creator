@@ -32,6 +32,7 @@
         <div class="col">
             <div class="card card-width shadow-sm">
                 <img class="card-img-top character-icon" src="asset/icon.svg" />
+                <img class="logo"></img>
                 <div class="card-body">
                     <h5 class="card-title">Character Name</h5>
                     <hr />
@@ -42,13 +43,9 @@
             </div>
         </div>
     </template>
-    <script>
-        const cardList = document.getElementById('card-list');
-        for (let i = 0; i < 2; i++) {
-            let template = document.getElementById("card-template").content.cloneNode(true);
-            cardList.insertBefore(template, cardList.firstChild);
-        }
-    </script>
+    <script src="src/util.js"></script>
+    <script src="src/systems.js"></script>
+    <script src="src/index.js"></script>
 </body>
 
 </html>

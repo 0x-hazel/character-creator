@@ -591,24 +591,33 @@ const SYSTEMS = {
                     false,
                     () => {
                         CHARACTER["Race"] = value.name;
-                        CHARACTER["Race Bonuses"] = new Map(
-                            value.ability_bonuses.map((
-                                x,
-                            ) => [x.ability_score.name, x.bonus]),
+                        CHARACTER["Race Bonuses"] = new Object(null);
+                        value.ability_bonuses.forEach(
+                            (x) =>
+                                CHARACTER["Race Bonuses"][
+                                    x.ability_score.name
+                                ] = x.bonus,
                         );
                         CHARACTER["Size"] = "Medium";
                         updateCharacterPreviews();
                     },
                 );
             });
-            CHARACTER["Class"] = new Map();
+            CHARACTER["Class"] = new Object(null);
             addEnum("Class", remote, "/api/2014/classes", async (value) => {
                 let name = document.createElement("h5");
-                name.setAttribute("class", "card-title no-margin");
+                name.setAttribute("class", "card-title no-margin class-title");
                 name.innerText = value.name;
+                let icon = document.createElement("img");
+                icon.classList.add("class-icon");
+                icon.setAttribute(
+                    "src",
+                    `asset/DnD5E_ClassSymb_${value.name}.webp`,
+                );
+                icon.setAttribute("test", "test");
                 return enumCard(
                     value.index,
-                    [name],
+                    [icon, name],
                     [
                         document.createElement("hr"),
                         quickStat("Hit Die", `d${value.hit_die}`),
@@ -632,12 +641,13 @@ const SYSTEMS = {
                     ],
                     true,
                     () => {
-                        if (CHARACTER["Class"].has(value.name)) {
-                            CHARACTER["Class"].delete(value.name);
+                        if (Object.hasOwn(CHARACTER["Class"], value.name)) {
+                            delete CHARACTER["Class"][value.name];
                         } else {
                             if (
-                                [...CHARACTER["Class"].entries()].reduce(
-                                    (prev, curr) => prev + curr[1],
+                                Object.keys(CHARACTER["Class"]).reduce(
+                                    (prev, curr) =>
+                                        prev + CHARACTER["Class"][curr],
                                     0,
                                 ) > CHARACTER["Character Level"]
                             ) {
@@ -645,12 +655,32 @@ const SYSTEMS = {
                                     "Character has more class levels than character levels",
                                 );
                             }
-                            CHARACTER["Class"].set(value.name, 1);
+                            CHARACTER["Class"][value.name] = 1;
                         }
                         updateCharacterPreviews();
                     },
                 );
             });
+        },
+        indexCard(character, card) {
+            card.querySelector(".logo").setAttribute(
+                "src",
+                `asset/${character.system}-logo.png`,
+            );
+            card.querySelector(".card-title").innerText = character["Name"];
+            if (Object.hasOwn(character, "avatar")) {
+                card.querySelector(".character-icon").setAttribute(
+                    "src",
+                    character["avatar"],
+                );
+            }
+            card.querySelector(".card-subtitle").innerText = `Level ${
+                character["Character Level"]
+            } ${character["Race"]} ${Object.keys(character["Class"])[0]}`;
+            card.querySelector(".stretched-link").setAttribute(
+                "href",
+                `character-sheet.html#${character["Name"]}`,
+            );
         },
         characterPreview() {
             return basicPreview(
@@ -664,11 +694,25 @@ const SYSTEMS = {
             race.innerText = CHARACTER["Race"] || "";
             result.appendChild(race);
             let classes = document.createElement("p");
-            classes.innerText = [...CHARACTER["Class"].entries()].map((x) =>
-                `${x[0]} Level ${x[1]}`
+            classes.innerText = Object.keys(CHARACTER["Class"]).map((x) =>
+                `${x} Level ${CHARACTER["Class"][x]}`
             ).join(", ");
             result.appendChild(classes);
             return result;
+        },
+        characterSheet(character) {
+            let name = document.createElement("h2");
+            name.innerText = character["Name"];
+            let details = document.createElement("h3");
+            details.innerText = `Level ${character["Character Level"]} ${
+                character["Race"]
+            }`;
+            blankCard(row(
+                icon(character["avatar"]),
+                col(name, details),
+                spacer(),
+                p("Classes"),
+            ));
         },
     },
 };
