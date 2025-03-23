@@ -60,4 +60,5 @@ try {
     container.appendChild(SYSTEMS[character.system].characterSheet(character));
 } catch (e) {
     console.error(e);
+    document.location.href = "./index.html";
 }

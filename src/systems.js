@@ -611,7 +611,13 @@ const SYSTEMS = {
                 },
             }); //new RemoteDataFetcher("https://www.dnd5eapi.co");
             addTextLine("Name", "Your Character's Name");
-            addRange("Character Level", 1, 20, 1);
+            addRange(
+                "Character Level",
+                1,
+                20,
+                1,
+                (lv) => CHARACTER["Level"] = lv,
+            );
             addEnum("Race", remote, "/api/2014/races", async (value) => {
                 let name = document.createElement("h5");
                 name.setAttribute("class", "card-title no-margin");
@@ -648,13 +654,27 @@ const SYSTEMS = {
                     () => {
                         CHARACTER["Race"] = value.name;
                         CHARACTER["Race Bonuses"] = new Object(null);
+                        CHARACTER["Languages"] = value.languages.map((x) =>
+                            x.name
+                        );
                         value.ability_bonuses.forEach(
                             (x) =>
                                 CHARACTER["Race Bonuses"][
                                     x.ability_score.name
                                 ] = x.bonus,
                         );
-                        CHARACTER["Size"] = "Medium";
+                        CHARACTER["Size"] = value.size;
+                        CHARACTER["Speed"] = value.speed;
+                        Promise.all(
+                            value.traits.map(async (trait) =>
+                                remote.fetch(trait.url)
+                            ),
+                        ).then((x) => {
+                            CHARACTER["Traits"] = x.map((value) => ({
+                                name: value.name,
+                                desc: value.desc[0],
+                            }));
+                        });
                         updateCharacterPreviews();
                     },
                 );
@@ -699,19 +719,51 @@ const SYSTEMS = {
                     () => {
                         if (Object.hasOwn(CHARACTER["Class"], value.name)) {
                             delete CHARACTER["Class"][value.name];
-                        } else {
-                            if (
-                                Object.keys(CHARACTER["Class"]).reduce(
-                                    (prev, curr) =>
-                                        prev + CHARACTER["Class"][curr],
-                                    0,
-                                ) > CHARACTER["Character Level"]
+                            if (CHARACTER["Class"].length === 0) {
+                                delete CHARACTER["Hit Die"];
+                            }
+                            for (
+                                let entry of value.proficiencies.map((x) =>
+                                    x.name
+                                )
                             ) {
-                                console.warn(
-                                    "Character has more class levels than character levels",
+                                CHARACTER["Proficiencies"] = removeFrom(
+                                    CHARACTER["Proficiencies"],
+                                    entry,
                                 );
                             }
+                            for (
+                                let entry of value.starting_equipment.map((x) =>
+                                    x.equipment.name
+                                )
+                            ) {
+                                CHARACTER["Equipment"] = removeFrom(
+                                    CHARACTER["Equipment"],
+                                    entry,
+                                );
+                            }
+                            destroySection(`${value.name} Level`);
+                        } else {
                             CHARACTER["Class"][value.name] = 1;
+                            addRange(
+                                `${value.name} Level`,
+                                1,
+                                20,
+                                1,
+                                (lv) => CHARACTER["Class"][value.name] = lv,
+                            );
+                            CHARACTER["Hit Die"] = CHARACTER["Hit Die"] ||
+                                value.hit_die;
+                            CHARACTER["Proficiencies"] =
+                                (CHARACTER["Proficiencies"] || []).concat(
+                                    value.proficiencies
+                                        .map((x) => x.name),
+                                );
+                            CHARACTER["Equipment"] =
+                                (CHARACTER["Equipment"] || []).concat(
+                                    value.starting_equipment
+                                        .map((x) => x.equipment.name),
+                                );
                         }
                         updateCharacterPreviews();
                     },
@@ -737,7 +789,7 @@ const SYSTEMS = {
                 );
             }
             card.querySelector(".card-subtitle").innerText = `Level ${
-                character["Character Level"]
+                character["Level"]
             } ${character["Race"]} ${Object.keys(character["Class"])[0]}`;
             card.querySelector(".stretched-link").setAttribute(
                 "href",
@@ -747,8 +799,37 @@ const SYSTEMS = {
         characterPreview() {
             return basicPreview(
                 CHARACTER["Name"] || "Unnamed Character",
-                `Level ${CHARACTER["Character Level"]}`,
+                `Level ${CHARACTER["Level"]}`,
             );
+        },
+        validateCharacter() {
+            let result = [];
+            if (CHARACTER["Name"].trim().length === 0) {
+                result.push("Character needs a name");
+            }
+            if (CHARACTER["Race"] === undefined) {
+                result.push("Character doesn't have a race");
+            }
+            if (Object.keys(CHARACTER["Class"]).length === 0) {
+                result.push("Character doesn't have a class");
+            }
+            if (
+                Object.keys(CHARACTER["Class"]).reduce(
+                    (prev, curr) => prev + CHARACTER["Class"][curr],
+                    0,
+                ) > CHARACTER["Level"]
+            ) {
+                result.push(
+                    "Character has more class levels than character levels",
+                );
+            }
+            for (let stat of ["STR", "DEX", "CON", "INT", "WIS", "CHA"]) {
+                let data = CHARACTER["Ability Scores"][stat];
+                if (data === undefined) {
+                    result.push(`Character has no ${stat} stat`);
+                }
+            }
+            return result;
         },
         characterDetails() {
             let result = document.createElement("div");
@@ -760,13 +841,35 @@ const SYSTEMS = {
                 `${x} Level ${CHARACTER["Class"][x]}`
             ).join(", ");
             result.appendChild(classes);
+            if (CHARACTER["Ability Scores"] !== undefined) {
+                let stats = document.createElement("ul");
+                for (let stat of ["STR", "DEX", "CON", "INT", "WIS", "CHA"]) {
+                    let data = CHARACTER["Ability Scores"][stat];
+                    if (data !== undefined) {
+                        let item = document.createElement("li");
+                        let name = document.createElement("b");
+                        name.innerText = `${data.name}: `;
+                        item.appendChild(name);
+                        let value = data.value.toString();
+                        if (
+                            CHARACTER["Race Bonuses"] !== undefined &&
+                            CHARACTER["Race Bonuses"][stat] !== undefined
+                        ) {
+                            value += ` + ${CHARACTER["Race Bonuses"][stat]}`;
+                        }
+                        item.appendChild(document.createTextNode(value));
+                        stats.appendChild(item);
+                    }
+                }
+                result.appendChild(stats);
+            }
             return result;
         },
         characterSheet(character) {
             let name = document.createElement("h2");
             name.innerText = character["Name"];
             let details = document.createElement("h3");
-            details.innerText = `Level ${character["Character Level"]}`;
+            details.innerText = `Level ${character["Level"]}`;
             return col(
                 blankCard(row(
                     icon(character["avatar"]),
@@ -783,7 +886,31 @@ const SYSTEMS = {
                 )),
                 row(
                     flexCol(
-                        titleCard("Stats"),
+                        titleCard(
+                            "Stats",
+                            quickTable(
+                                undefined,
+                                Object.entries(character["Ability Scores"]).map(
+                                    (
+                                        [key, x],
+                                    ) => [
+                                        x.name,
+                                        `${
+                                            x.value +
+                                            (character["Race Bonuses"][key] ||
+                                                0)
+                                        } (${
+                                            calcAbilityModifier(
+                                                x.value +
+                                                    (character["Race Bonuses"][
+                                                        key
+                                                    ] || 0),
+                                            )
+                                        })`,
+                                    ],
+                                ),
+                            ),
+                        ),
                     ),
                     flexCol(
                         p("two"),
@@ -796,3 +923,27 @@ const SYSTEMS = {
         },
     },
 };
+
+function calcAbilityModifier(stat) {
+    if (stat <= 3) {
+        return "-4";
+    } else if (stat <= 5) {
+        return "-3";
+    } else if (stat <= 7) {
+        return "-2";
+    } else if (stat <= 9) {
+        return "-1";
+    } else if (stat <= 11) {
+        return "0";
+    } else if (stat <= 13) {
+        return "+1";
+    } else if (stat < 15) {
+        return "+2";
+    } else if (stat < 17) {
+        return "+3";
+    } else if (stat < 19) {
+        return "+4";
+    } else {
+        return "+5";
+    }
+}

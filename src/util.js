@@ -63,3 +63,38 @@ class RemoteDataFetcher extends DataFetcher {
 function getStorage() {
     return sessionStorage; // make localStorage once development is stable
 }
+
+function removeFrom(list, value) {
+    return list.filter((el) =>
+        !Object.entries(value).reduce(
+            (prev, [k, v]) => prev && (el[k] === v),
+            true,
+        )
+    );
+}
+
+// console.log(
+//     removeFrom([{ test: 1 }, { test: 5 }, { test: 1341 }, { test: 7 }], {
+//         test: 1341,
+//     }),
+// );
+
+function quickTable(name, values) {
+    let result = document.createElement("div");
+    if (name) {
+        let title = document.createElement("b");
+        title.innerText = name;
+        result.appendChild(title);
+    }
+    let list = document.createElement("ul");
+    for (let element of values) {
+        let el = document.createElement("li");
+        let b = document.createElement("b");
+        b.innerText = `${element[0]}: `;
+        el.appendChild(b);
+        el.appendChild(document.createTextNode(element[1]));
+        list.appendChild(el);
+    }
+    result.appendChild(list);
+    return result;
+}

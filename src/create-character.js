@@ -17,12 +17,16 @@ function to_id(name) {
 function createSection(name, contents) {
     let section = SECTION_TEMPLATE.content.cloneNode(true);
     let item = section.querySelector(".accordion-item");
-    item.innerHTML = item.innerHTML.replaceAll("!NAME!", name).replaceAll(
+    item.outerHTML = item.outerHTML.replaceAll("!NAME!", name).replaceAll(
         "!ID!",
         to_id(name),
     );
     section.querySelector(".accordion-body").appendChild(contents);
     ACCORDION.appendChild(section);
+}
+
+function destroySection(name) {
+    document.getElementById(`section-${to_id(name)}`).remove();
 }
 
 function addTextLine(name, placeholder) {
@@ -46,8 +50,8 @@ function addTextLine(name, placeholder) {
     createSection(name, div);
 }
 
-function addRange(name, min, max, initial) {
-    CHARACTER[name] = initial;
+function addRange(name, min, max, initial, callback) {
+    callback(initial);
     let id = `range-${to_id(name)}`;
     let label = document.createElement("label");
     label.classList.add("d-block");
@@ -64,7 +68,8 @@ function addRange(name, min, max, initial) {
     span.innerText = initial;
     range.addEventListener("input", function () {
         span.innerText = this.value;
-        CHARACTER[name] = this.value;
+        callback(this.value);
+        //CHARACTER[name] = this.value;
         updateCharacterPreviews();
     });
     let div = document.createElement("div");
@@ -155,6 +160,7 @@ function addStatPicker(name, remote, path, { num, sides, keep }) {
                     name: data.full_name,
                     value: result,
                 };
+                updateCharacterPreviews();
             });
             entry.querySelector(".card").appendChild(button);
 
@@ -219,24 +225,6 @@ function quickStat(name, value) {
     span.innerText = `${name}: `;
     result.appendChild(span);
     result.appendChild(document.createTextNode(value));
-    return result;
-}
-
-function quickTable(name, values) {
-    let result = document.createElement("div");
-    let title = document.createElement("b");
-    title.innerText = name;
-    result.appendChild(title);
-    let list = document.createElement("ul");
-    for (let element of values) {
-        let el = document.createElement("li");
-        let b = document.createElement("b");
-        b.innerText = `${element[0]}: `;
-        el.appendChild(b);
-        el.appendChild(document.createTextNode(element[1]));
-        list.appendChild(el);
-    }
-    result.appendChild(list);
     return result;
 }
 
@@ -320,7 +308,22 @@ function updateCharacterPreviews() {
 
 function saveCharacter() {
     CHARACTER["system"] = SYS;
-    getStorage().setItem(CHARACTER["Name"], JSON.stringify(CHARACTER));
+    let issues = SYSTEMS[SYS].validateCharacter();
+    if (issues.length === 0) {
+        getStorage().setItem(CHARACTER["Name"], JSON.stringify(CHARACTER));
+        window.location.href = `./character-sheet.html#${
+            encodeURIComponent(CHARACTER["Name"])
+        }`;
+    } else {
+        let issue_list = document.getElementById("save-fail-reasons");
+        issue_list.innerHTML = "";
+        for (let issue of issues) {
+            let el = document.createElement("li");
+            el.innerText = issue;
+            issue_list.appendChild(el);
+        }
+        new bootstrap.Modal(document.getElementById("issuesModal")).show();
+    }
 }
 
 const SYS = document.location.hash.substring(1) || "dnd";
