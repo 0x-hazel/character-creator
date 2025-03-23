@@ -104,6 +104,74 @@ function addEnum(name, remote, path, transformer) {
     });
 }
 
+function addStatPicker(name, remote, path, { num, sides, keep }) {
+    CHARACTER[name] = CHARACTER[name] || new Object(null);
+    function roll() {
+        let results = [];
+        for (let i = 0; i < num; i++) {
+            results.push(Math.floor(Math.random() * sides) + 1);
+        }
+        results.sort((a, b) => b - a);
+        results.length = keep;
+        return results.reduce((p, c) => p + c, 0);
+    }
+    let spinner = SPINNER.content.cloneNode(true);
+    let content = document.createElement("div");
+    content.appendChild(spinner);
+    createSection(name, content);
+    remote.fetch(path).then(async (value) => {
+        let grid = document.createElement("div");
+        grid.setAttribute("class", "row g-3 p-3");
+        console.log(value);
+        for (let val of value.results) {
+            let data = await remote.fetch(val["url"]);
+            if (data === undefined) {
+                continue;
+            }
+            let entry = ENUM_CARD.content.cloneNode(true);
+            entry.querySelector(".stretched-link").remove();
+
+            let title = document.createElement("h5");
+            title.className = "card-title no-margin";
+            title.innerText = data.full_name;
+            entry.querySelector(".card-body").appendChild(title);
+            entry.querySelector(".card-body").appendChild(
+                document.createElement("hr"),
+            );
+            let text = document.createElement("p");
+            text.innerText = data.desc[0];
+            entry.querySelector(".card-body").appendChild(text);
+            let number = document.createElement("h4");
+            number.className = "no-margin text-center";
+            entry.querySelector(".card-body").appendChild(number);
+            let button = document.createElement("button");
+            button.innerText = "Roll";
+            button.setAttribute("type", "button");
+            button.className = "btn btn-primary";
+            button.addEventListener("click", () => {
+                let result = roll();
+                number.innerText = result.toString();
+                CHARACTER[name][data.name] = {
+                    name: data.full_name,
+                    value: result,
+                };
+            });
+            entry.querySelector(".card").appendChild(button);
+
+            let gridEntry = document.createElement("div");
+            gridEntry.setAttribute("class", "col-lg-3 col-md-6 col-sm-12");
+            try {
+                gridEntry.appendChild(entry);
+            } catch (e) {
+                console.error(e);
+            }
+            grid.appendChild(gridEntry);
+        }
+        content.innerHTML = "";
+        content.appendChild(grid);
+    });
+}
+
 function enumCard(id, shown, expanded, isMulti = false, select = () => {
     console.log("click");
 }) {

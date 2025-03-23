@@ -5,6 +5,62 @@ const SYSTEMS = {
             let remote = new LocalDataFetcher({
                 api: {
                     2014: {
+                        "ability-scores": {
+                            cha: {
+                                "index": "cha",
+                                "name": "CHA",
+                                "full_name": "Charisma",
+                                "desc": [
+                                    "Charisma measures your ability to interact effectively with others. It includes such factors as confidence and eloquence, and it can represent a charming or commanding personality.",
+                                    "A Charisma check might arise when you try to influence or entertain others, when you try to make an impression or tell a convincing lie, or when you are navigating a tricky social situation. The Deception, Intimidation, Performance, and Persuasion skills reflect aptitude in certain kinds of Charisma checks.",
+                                ],
+                                "skills": [{
+                                    "name": "Deception",
+                                    "index": "deception",
+                                    "url": "/api/2014/skills/deception",
+                                }, {
+                                    "name": "Intimidation",
+                                    "index": "intimidation",
+                                    "url": "/api/2014/skills/intimidation",
+                                }, {
+                                    "name": "Performance",
+                                    "index": "performance",
+                                    "url": "/api/2014/skills/performance",
+                                }, {
+                                    "name": "Persuasion",
+                                    "index": "persuasion",
+                                    "url": "/api/2014/skills/persuasion",
+                                }],
+                                "url": "/api/2014/ability-scores/cha",
+                                "updated_at": "2025-03-19T04:12:34.922Z",
+                            },
+                            "count": 6,
+                            "results": [{
+                                "index": "cha",
+                                "name": "CHA",
+                                "url": "/api/2014/ability-scores/cha",
+                            }, {
+                                "index": "con",
+                                "name": "CON",
+                                "url": "/api/2014/ability-scores/con",
+                            }, {
+                                "index": "dex",
+                                "name": "DEX",
+                                "url": "/api/2014/ability-scores/dex",
+                            }, {
+                                "index": "int",
+                                "name": "INT",
+                                "url": "/api/2014/ability-scores/int",
+                            }, {
+                                "index": "str",
+                                "name": "STR",
+                                "url": "/api/2014/ability-scores/str",
+                            }, {
+                                "index": "wis",
+                                "name": "WIS",
+                                "url": "/api/2014/ability-scores/wis",
+                            }],
+                        },
                         traits: {
                             "damage-resistance": {
                                 "index": "damage-resistance",
@@ -661,6 +717,12 @@ const SYSTEMS = {
                     },
                 );
             });
+            addStatPicker(
+                "Ability Scores",
+                remote,
+                "/api/2014/ability-scores",
+                { num: 4, sides: 6, keep: 3 },
+            );
         },
         indexCard(character, card) {
             card.querySelector(".logo").setAttribute(
@@ -704,15 +766,33 @@ const SYSTEMS = {
             let name = document.createElement("h2");
             name.innerText = character["Name"];
             let details = document.createElement("h3");
-            details.innerText = `Level ${character["Character Level"]} ${
-                character["Race"]
-            }`;
-            blankCard(row(
-                icon(character["avatar"]),
-                col(name, details),
-                spacer(),
-                p("Classes"),
-            ));
+            details.innerText = `Level ${character["Character Level"]}`;
+            return col(
+                blankCard(row(
+                    icon(character["avatar"]),
+                    col(name, details),
+                    spacer(),
+                    col(
+                        p(character["Race"]),
+                        row(
+                            ...Object.keys(character["Class"]).map((x) =>
+                                p(`Level ${character["Class"][x]} ${x}`)
+                            ),
+                        ),
+                    ),
+                )),
+                row(
+                    flexCol(
+                        titleCard("Stats"),
+                    ),
+                    flexCol(
+                        p("two"),
+                    ),
+                    flexCol(
+                        p("three"),
+                    ),
+                ),
+            );
         },
     },
 };

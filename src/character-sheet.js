@@ -1,6 +1,6 @@
 function row(...elements) {
     let div = document.createElement("div");
-    div.className = "d-flex flex-row";
+    div.className = "d-flex flex-row gap-3";
     for (let el of elements) {
         div.appendChild(el);
     }
@@ -8,11 +8,16 @@ function row(...elements) {
 }
 function col(...elements) {
     let div = document.createElement("div");
-    div.className = "d-flex flex-column";
+    div.className = "d-flex flex-column gap-3";
     for (let el of elements) {
         div.appendChild(el);
     }
     return div;
+}
+function flexCol(...elements) {
+    let result = col(...elements);
+    result.classList.add("flex-grow-1");
+    return result;
 }
 function spacer() {
     let div = document.createElement("div");
@@ -40,19 +45,19 @@ function blankCard(...contents) {
     for (let el of contents) {
         body.appendChild(el);
     }
-    container.appendChild(template);
+    return template;
 }
 function titleCard(title, ...contents) {
     let title_el = document.createElement("h5");
     title_el.classList.add("card-title");
     title_el.innerText = title;
-    blankCard(title_el, ...contents);
+    return blankCard(title_el, ...contents);
 }
 
-let character = document.location.hash.substring(1);
+let character = decodeURIComponent(document.location.hash).substring(1);
 try {
     character = JSON.parse(getStorage().getItem(character));
-    SYSTEMS[character.system].characterSheet(character);
+    container.appendChild(SYSTEMS[character.system].characterSheet(character));
 } catch (e) {
     console.error(e);
 }
