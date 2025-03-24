@@ -11,12 +11,30 @@
 </head>
 
 <body>
+    <div class="modal fade" id="issuesModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalLabel">Couldn't save character!</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Couldn't save because:
+                    <ul id="save-fail-reasons"></ul>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary w-50 mx-auto" data-bs-dismiss="modal">Okay</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <div id="main">
         <div class="character-sheet">
             <div id="char-preview"></div>
-            <div id="char-details"></div>
+            <div id="char-details" class="mx-4"></div>
             <div class="d-grid gap-2 col-6 mx-auto">
                 <button onclick="saveCharacter()" class="btn btn-primary">Save</button>
+                <button onclick="document.location.href = './index.html'" class="btn btn-secondary">Exit</button>
             </div>
         </div>
         <div id="accordion" class="accordion accordion-flush">
@@ -24,7 +42,7 @@
     </div>
 
     <template id="accordion-section">
-        <div class="accordion-item">
+        <div id="section-!ID!" class="accordion-item">
             <h2 class="accordion-header">
                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
                     data-bs-target="#!ID!" aria-expanded="false" aria-controls="!ID!">

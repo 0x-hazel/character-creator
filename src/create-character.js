@@ -17,12 +17,16 @@ function to_id(name) {
 function createSection(name, contents) {
     let section = SECTION_TEMPLATE.content.cloneNode(true);
     let item = section.querySelector(".accordion-item");
-    item.innerHTML = item.innerHTML.replaceAll("!NAME!", name).replaceAll(
+    item.outerHTML = item.outerHTML.replaceAll("!NAME!", name).replaceAll(
         "!ID!",
         to_id(name),
     );
     section.querySelector(".accordion-body").appendChild(contents);
     ACCORDION.appendChild(section);
+}
+
+function destroySection(name) {
+    document.getElementById(`section-${to_id(name)}`).remove();
 }
 
 function addTextLine(name, placeholder) {
@@ -46,8 +50,8 @@ function addTextLine(name, placeholder) {
     createSection(name, div);
 }
 
-function addRange(name, min, max, initial) {
-    CHARACTER[name] = initial;
+function addRange(name, min, max, initial, callback) {
+    callback(initial);
     let id = `range-${to_id(name)}`;
     let label = document.createElement("label");
     label.classList.add("d-block");
@@ -64,7 +68,8 @@ function addRange(name, min, max, initial) {
     span.innerText = initial;
     range.addEventListener("input", function () {
         span.innerText = this.value;
-        CHARACTER[name] = this.value;
+        callback(this.value);
+        //CHARACTER[name] = this.value;
         updateCharacterPreviews();
     });
     let div = document.createElement("div");
@@ -104,6 +109,75 @@ function addEnum(name, remote, path, transformer) {
     });
 }
 
+function addStatPicker(name, remote, path, { num, sides, keep }) {
+    CHARACTER[name] = CHARACTER[name] || new Object(null);
+    function roll() {
+        let results = [];
+        for (let i = 0; i < num; i++) {
+            results.push(Math.floor(Math.random() * sides) + 1);
+        }
+        results.sort((a, b) => b - a);
+        results.length = keep;
+        return results.reduce((p, c) => p + c, 0);
+    }
+    let spinner = SPINNER.content.cloneNode(true);
+    let content = document.createElement("div");
+    content.appendChild(spinner);
+    createSection(name, content);
+    remote.fetch(path).then(async (value) => {
+        let grid = document.createElement("div");
+        grid.setAttribute("class", "row g-3 p-3");
+        console.log(value);
+        for (let val of value.results) {
+            let data = await remote.fetch(val["url"]);
+            if (data === undefined) {
+                continue;
+            }
+            let entry = ENUM_CARD.content.cloneNode(true);
+            entry.querySelector(".stretched-link").remove();
+
+            let title = document.createElement("h5");
+            title.className = "card-title no-margin";
+            title.innerText = data.full_name;
+            entry.querySelector(".card-body").appendChild(title);
+            entry.querySelector(".card-body").appendChild(
+                document.createElement("hr"),
+            );
+            let text = document.createElement("p");
+            text.innerText = data.desc[0];
+            entry.querySelector(".card-body").appendChild(text);
+            let number = document.createElement("h4");
+            number.className = "no-margin text-center";
+            entry.querySelector(".card-body").appendChild(number);
+            let button = document.createElement("button");
+            button.innerText = "Roll";
+            button.setAttribute("type", "button");
+            button.className = "btn btn-primary";
+            button.addEventListener("click", () => {
+                let result = roll();
+                number.innerText = result.toString();
+                CHARACTER[name][data.name] = {
+                    name: data.full_name,
+                    value: result,
+                };
+                updateCharacterPreviews();
+            });
+            entry.querySelector(".card").appendChild(button);
+
+            let gridEntry = document.createElement("div");
+            gridEntry.setAttribute("class", "col-lg-3 col-md-6 col-sm-12");
+            try {
+                gridEntry.appendChild(entry);
+            } catch (e) {
+                console.error(e);
+            }
+            grid.appendChild(gridEntry);
+        }
+        content.innerHTML = "";
+        content.appendChild(grid);
+    });
+}
+
 function enumCard(id, shown, expanded, isMulti = false, select = () => {
     console.log("click");
 }) {
@@ -132,59 +206,6 @@ function enumCard(id, shown, expanded, isMulti = false, select = () => {
     result.appendChild(content);
     result.innerHTML = result.innerHTML.replaceAll("!ID!", id);
     return template;
-}
-
-function quickSection(title, text) {
-    let result = document.createElement("div");
-    let bold = document.createElement("b");
-    bold.innerText = title;
-    let parag = document.createElement("p");
-    parag.innerText = text;
-    result.appendChild(bold);
-    result.appendChild(parag);
-    return result;
-}
-
-function quickStat(name, value) {
-    let result = document.createElement("p");
-    let span = document.createElement("b");
-    span.innerText = `${name}: `;
-    result.appendChild(span);
-    result.appendChild(document.createTextNode(value));
-    return result;
-}
-
-function quickTable(name, values) {
-    let result = document.createElement("div");
-    let title = document.createElement("b");
-    title.innerText = name;
-    result.appendChild(title);
-    let list = document.createElement("ul");
-    for (let element of values) {
-        let el = document.createElement("li");
-        let b = document.createElement("b");
-        b.innerText = `${element[0]}: `;
-        el.appendChild(b);
-        el.appendChild(document.createTextNode(element[1]));
-        list.appendChild(el);
-    }
-    result.appendChild(list);
-    return result;
-}
-
-function quickList(name, values) {
-    let result = document.createElement("div");
-    let title = document.createElement("b");
-    title.innerText = name;
-    result.appendChild(title);
-    let list = document.createElement("ul");
-    for (let element of values) {
-        let el = document.createElement("li");
-        el.innerText = element;
-        list.appendChild(el);
-    }
-    result.appendChild(list);
-    return result;
 }
 
 async function quickTrait(remote, path) {
@@ -252,7 +273,22 @@ function updateCharacterPreviews() {
 
 function saveCharacter() {
     CHARACTER["system"] = SYS;
-    getStorage().setItem(CHARACTER["Name"], JSON.stringify(CHARACTER));
+    let issues = SYSTEMS[SYS].validateCharacter();
+    if (issues.length === 0) {
+        getStorage().setItem(CHARACTER["Name"], JSON.stringify(CHARACTER));
+        window.location.href = `./character-sheet.html#${
+            encodeURIComponent(CHARACTER["Name"])
+        }`;
+    } else {
+        let issue_list = document.getElementById("save-fail-reasons");
+        issue_list.innerHTML = "";
+        for (let issue of issues) {
+            let el = document.createElement("li");
+            el.innerText = issue;
+            issue_list.appendChild(el);
+        }
+        new bootstrap.Modal(document.getElementById("issuesModal")).show();
+    }
 }
 
 const SYS = document.location.hash.substring(1) || "dnd";

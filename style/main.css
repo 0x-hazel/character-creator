@@ -13,6 +13,7 @@
     height: 96px;
     margin-top: var(--bs-card-spacer-y);
     align-self: center;
+    border-radius: 50%;
 }
 
 .card-width {
@@ -33,4 +34,4 @@ img {
 
 img[src] {
    display: block;
- }
+}
