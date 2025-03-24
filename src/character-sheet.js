@@ -16,7 +16,7 @@ function col(...elements) {
 }
 function flexCol(...elements) {
     let result = col(...elements);
-    result.classList.add("flex-grow-1");
+    result.classList.add("flex-1");
     return result;
 }
 function spacer() {
@@ -34,6 +34,25 @@ function p(text) {
     let p = document.createElement("p");
     p.innerText = text;
     return p;
+}
+function vr() {
+    let result = document.createElement("div");
+    result.classList.add("vr");
+    return result;
+}
+function h(num, content) {
+    let result = document.createElement(`h${num}`);
+    result.innerText = content;
+    return result;
+}
+function button(text, appearance, callback) {
+    let button = document.createElement("button");
+    button.setAttribute("type", "button");
+    button.classList.add("btn");
+    button.classList.add(`btn-${appearance}`);
+    button.innerText = text;
+    button.addEventListener("click", callback);
+    return button;
 }
 
 const TEMPLATE = document.getElementById("card-template");

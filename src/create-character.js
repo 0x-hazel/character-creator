@@ -208,41 +208,6 @@ function enumCard(id, shown, expanded, isMulti = false, select = () => {
     return template;
 }
 
-function quickSection(title, text) {
-    let result = document.createElement("div");
-    let bold = document.createElement("b");
-    bold.innerText = title;
-    let parag = document.createElement("p");
-    parag.innerText = text;
-    result.appendChild(bold);
-    result.appendChild(parag);
-    return result;
-}
-
-function quickStat(name, value) {
-    let result = document.createElement("p");
-    let span = document.createElement("b");
-    span.innerText = `${name}: `;
-    result.appendChild(span);
-    result.appendChild(document.createTextNode(value));
-    return result;
-}
-
-function quickList(name, values) {
-    let result = document.createElement("div");
-    let title = document.createElement("b");
-    title.innerText = name;
-    result.appendChild(title);
-    let list = document.createElement("ul");
-    for (let element of values) {
-        let el = document.createElement("li");
-        el.innerText = element;
-        list.appendChild(el);
-    }
-    result.appendChild(list);
-    return result;
-}
-
 async function quickTrait(remote, path) {
     let content = document.createElement("div");
     let value = await remote.fetch(path);

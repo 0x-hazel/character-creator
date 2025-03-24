@@ -61,7 +61,7 @@ class RemoteDataFetcher extends DataFetcher {
 // console.log(x);
 
 function getStorage() {
-    return sessionStorage; // make localStorage once development is stable
+    return localStorage; // make localStorage once development is stable
 }
 
 function removeFrom(list, value) {
@@ -87,6 +87,7 @@ function quickTable(name, values) {
         result.appendChild(title);
     }
     let list = document.createElement("ul");
+    list.classList.add("no-margin");
     for (let element of values) {
         let el = document.createElement("li");
         let b = document.createElement("b");
@@ -96,5 +97,44 @@ function quickTable(name, values) {
         list.appendChild(el);
     }
     result.appendChild(list);
+    return result;
+}
+
+function quickList(name, values) {
+    let result = document.createElement("div");
+    if (name) {
+        let title = document.createElement("b");
+        title.innerText = name;
+        result.appendChild(title);
+    }
+    let list = document.createElement("ul");
+    list.classList.add("no-margin");
+    for (let element of values) {
+        let el = document.createElement("li");
+        el.innerText = element;
+        list.appendChild(el);
+    }
+    result.appendChild(list);
+    return result;
+}
+
+function quickStat(name, value) {
+    let result = document.createElement("p");
+    result.classList.add("no-margin");
+    let span = document.createElement("b");
+    span.innerText = `${name}: `;
+    result.appendChild(span);
+    result.appendChild(document.createTextNode(value));
+    return result;
+}
+
+function quickSection(title, text) {
+    let result = document.createElement("div");
+    let bold = document.createElement("b");
+    bold.innerText = title;
+    let parag = document.createElement("p");
+    parag.innerText = text;
+    result.appendChild(bold);
+    result.appendChild(parag);
     return result;
 }
